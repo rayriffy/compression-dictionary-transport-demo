@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script>
+        // Locate which Three.JS version to load
+        const targetVersionFromQueryString = Number(
+            new URL(window.location.href).searchParams.get('version')
+        )
+        const targetVersion = Number.isSafeInteger(targetVersionFromQueryString) && targetVersionFromQueryString > 0
+            ? targetVersionFromQueryString
+            : 168
+
+        // Construct the URL to load the Three.JS module
+        const moduleUrl = new URL(`js/${targetVersion}.js`, location.href)
+
+        // Observe load time
+        const observer = new PerformanceObserver((list) => {
+            list.getEntries().forEach((entry) => {
+                if (entry.name == moduleUrl) {
+                    const timeToFetch = entry.responseEnd - entry.fetchStart;
+                    document.getElementById('load-time').textContent = `${timeToFetch} ms`;
+                }
+            })
+        })
+        observer.observe({
+            type: "resource",
+            buffered: true
+        })
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const importMapContent = `
+                {
+                    "imports": {
+                        "three": "${moduleUrl}"
+                    }
+                }
+            `
+
+            const cubeContent = `
+                import * as THREE from 'three';
+
+                // set three.ks version
+                document.getElementById('threejs-version').textContent = THREE.REVISION;
+
+                // define canvas size
+                const width = 500;
+                const height = 500;
+
+                // create scene, camera, and renderer
+                const scene = new THREE.Scene();
+                const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+                const renderer = new THREE.WebGLRenderer({
+                    canvas: document.querySelector('canvas')
+                });
+                renderer.setSize(width, height);
+
+                // mount to dom
+                document.getElementById('render').appendChild(renderer.domElement);
+
+                // create cube
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshNormalMaterial({
+                    color: 0x00ff00
+                });
+                const cube = new THREE.Mesh(geometry, material);
+                scene.add(cube);
+
+                // set camera position
+                camera.position.z = 5;
+
+                // render
+                function animate() {
+                    requestAnimationFrame(animate);
+
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+
+                    renderer.render(scene, camera);
+                }
+                animate();
+            `
+
+            // build element
+            const importMapElement = document.createElement('script');
+            importMapElement.type = 'importmap';
+            importMapElement.appendChild(document.createTextNode(importMapContent));
+
+            const cubeElement = document.createElement('script');
+            cubeElement.type = 'module';
+            cubeElement.appendChild(document.createTextNode(cubeContent));
+
+            document.head.appendChild(importMapElement);
+            document.head.appendChild(cubeElement);
+        })
+    </script>
+</head>
+
+<body>
+    <main class="max-w-4xl mx-auto p-16 space-y-8">
+        <section class="space-y-2">
+            <h1 class="font-title text-4xl font-bold">Cube</h1>
+            <p class="text-gray-700">Three.JS version <kbd class="kbd" id="threejs-version"></kbd> loaded in <kbd
+                    class="kbd" id="load-time"></kbd></p>
+        </section>
+        <section id="render">
+            <canvas></canvas>
+        </section>
+    </main>
+</body>
+
+</html>

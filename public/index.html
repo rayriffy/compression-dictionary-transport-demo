@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body>
+    <main class="max-w-4xl mx-auto p-16 space-y-8">
+        <section class="space-y-2">
+            <h1 class="font-title text-4xl font-bold">Compression Dictionary Transport demo</h1>
+            <p class="text-gray-700">This demo will demonstrate how compression dictionary can be used for delta updating static JS files.</p>
+        </section>
+        <section class="space-y-2">
+            <h2 class="font-title text-2xl font-bold">Prerequisites</h2>
+            <ol class="list-decimal list-inside">
+                <li>Chrome 130 or later</li>
+                <li>Enable <a href="chrome://flags/#enable-compression-dictionary-transport" target="_blank" class="text-blue-500">chrome://flags/#enable-compression-dictionary-transport</a></li>
+                <li>Open DevTools, and navigate to the <code>Network</code> tab.</li>
+            </ol>
+        </section>
+        <div class="tabs tabs-lift">
+            <input type="radio" name="my_tabs_3" class="tab" aria-label="Step 1" checked="checked" />
+            <div class="tab-content bg-base-100 border-base-300 p-6">
+                <ol class="list-decimal list-inside">
+                    <li>Load version <kbd class="kbd">168</kbd> of Three.JS with url <a href="/cube.html?version=168" class="text-blue-500">/cube.html?version=168</a></li>
+                    <li>You can see that in <kbd class="kbd">168.js</kbd> tab, network sends <b>205 kB</b> to browser</li>
+                    <li>Served file is compressed regularly with Brotil (<b>1,298,981 bytes</b> down to <b>204,293 bytes</b>) (<b>~80%</b> compression ratio)</li>
+                    <li>
+                        When click into <kbd class="kbd">168.js</kbd>, you can see this header
+                        <div class="mockup-code w-full my-4">
+                            <pre data-prefix=""><code>Use-As-Dictionary: match="/js/*"</code></pre>
+                        </div>
+                        This header means content of <kbd class="kbd">168.js</kbd> can be used as <b>shared dictionary</b> for fetching resources under "<kbd class="kbd">/js/</kbd>"
+                    </li>
+                    <li>You can observe saved dictionary at <a href="chrome://net-internals/#sharedDictionary" target="_blank" class="text-blue-500">chrome://net-internals/#sharedDictionary</a></li>
+                </ol>
+            </div>
+
+            <input type="radio" name="my_tabs_3" class="tab" aria-label="Step 2" />
+            <div class="tab-content bg-base-100 border-base-300 p-6">
+                <ol class="list-decimal list-inside">
+                    <li>Load version <kbd class="kbd">169</kbd> of Three.JS with url <a href="/cube.html?version=169" class="text-blue-500">/cube.html?version=169</a></li>
+                    <li>You can see that in <kbd class="kbd">169.js</kbd> tab, network sends <b>2.7 kB</b> to browser</li>
+                    <li>Served file is compressed (<b>1,304,820 bytes</b> down to <b>2,367 bytes</b>) (<b>~98%</b> compression ratio)</li>
+                    <li>
+                        When click into <kbd class="kbd">168.js</kbd>, you can see request header
+                        <div class="mockup-code w-full my-4">
+                            <pre data-prefix=""><code>Available-Dictionary: :vb4dATO16OAr1imavHUzirMuUiXA2zn08+dqIsu+sVY=:</code></pre>
+                            <pre data-prefix=""><code>Accept-Encoding: gzip, deflate, br, zstd, dcb, dcz</code></pre>
+                        </div>
+                        With <kbd class="kbd">dcb</kbd>, or <kbd class="kbd">dcz</kbd> present, it means that browser has a dictionary with provided hash, and able to use shared dictionary compression
+                    </li>
+                    <li>
+                        And you can also see response header
+                        <div class="mockup-code w-full my-4">
+                            <pre data-prefix=""><code>Content-Encoding: dbz</code></pre>
+                            <pre data-prefix=""><code>Content-Dictionary: :vb4dATO16OAr1imavHUzirMuUiXA2zn08+dqIsu+sVY=:</code></pre>
+                        </div>
+                        This means that response is currently served by using compressed zstd dictionary
+                    </li>
+                    <li>
+                        Additionally, response headers also contains
+                        <div class="mockup-code w-full my-4">
+                            <pre data-prefix=""><code>Use-As-Dictionary: match="/js/*"</code></pre>
+                        </div>
+                        So the content of <kbd class="kbd">169.js</kbd> can be used as <b>shared dictionary</b> for fetching resources under "<kbd class="kbd">/js/</kbd>"
+                    </li>
+                    <li>You can observe <b>updated</b> dictionary at <a href="chrome://net-internals/#sharedDictionary" target="_blank" class="text-blue-500">chrome://net-internals/#sharedDictionary</a></li>
+                </ol>
+            </div>
+
+            <input type="radio" name="my_tabs_3" class="tab" aria-label="Step 3" />
+            <div class="tab-content bg-base-100 border-base-300 p-6">
+                <ol class="list-decimal list-inside">
+                    <li>Load version <kbd class="kbd">170</kbd> of Three.JS with url <a href="/cube.html?version=170" class="text-blue-500">/cube.html?version=170</a></li>
+                    <li>You can see that in <kbd class="kbd">170.js</kbd> tab, network sends <b>5.8 kB</b> to browser</li>
+                    <li>Served file is compressed (<b>1,314,681 bytes</b> down to <b>5,465 bytes</b>) (<b>~96%</b> compression ratio)</li>
+                    <li>You can observe <b>updated</b> dictionary at <a href="chrome://net-internals/#sharedDictionary" target="_blank" class="text-blue-500">chrome://net-internals/#sharedDictionary</a></li>
+                </ol>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
