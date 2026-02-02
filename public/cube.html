@@ -64,7 +64,7 @@
                 document.getElementById('render').appendChild(renderer.domElement);
 
                 // create cube
-                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const geometry = new THREE.BoxGeometry(2, 2, 2);
                 const material = new THREE.MeshNormalMaterial({
                     color: 0x00ff00
                 });
@@ -72,7 +72,7 @@
                 scene.add(cube);
 
                 // set camera position
-                camera.position.z = 5;
+                camera.position.z = 4;
 
                 // render
                 function animate() {
