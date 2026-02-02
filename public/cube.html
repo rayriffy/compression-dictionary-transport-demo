@@ -17,7 +17,7 @@
             : 168
 
         // Construct the URL to load the Three.JS module
-        const moduleUrl = new URL(`js/${targetVersion}.js`, location.href)
+        const moduleUrl = new URL(`/js/${targetVersion}.js`, location.href)
 
         // Observe load time
         const observer = new PerformanceObserver((list) => {
