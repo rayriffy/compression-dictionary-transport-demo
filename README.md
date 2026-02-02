@@ -1,15 +1,18 @@
-# compression-dictionary-demo
+# Compression Dictionary Transport demo
 
-To install dependencies:
+This is a small demo project to show an ability of transporting a compression dictionary over a network.
 
-```bash
-bun install
-```
+### Run via Docker
 
-To run:
+We do provide docker image ready for this demo. You can run it by following command:
 
 ```bash
-bun run index.ts
+docker run --rm --name cdt-demo -p 3000:3000 ghcr.io/rayriffy/compression-dictionary-demo:latest
 ```
 
-This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+As a result you should be able to access the demo at `http://localhost:3000`. Then following instructions in the browser.
+
+### Run demo manually
+
+Pre-bake all compressed scripts by running `bun run bake`, then start the server by running `bun run start`.
+As a result you should be able to access the demo at `http://localhost:3000`. Then following instructions in the browser.
